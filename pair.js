@@ -1,7 +1,6 @@
 
 const express = require("express");
 const fs = require("fs");
-const { exec } = require("child_process");
 const pino = require("pino");
 
 const {
@@ -215,21 +214,6 @@ router.get("/", async (req, res) => {
                                 err
                             );
 
-                            /*
-                             * Restart PM2 only if needed.
-                             */
-                            exec(
-                                "pm2 restart danuwa",
-                                (error) => {
-                                    if (error) {
-                                        console.error(
-                                            "PM2 restart error:",
-                                            error
-                                        );
-                                    }
-                                }
-                            );
-
                             return;
                         }
 
@@ -318,20 +302,6 @@ router.get("/", async (req, res) => {
                 });
             }
 
-            /*
-             * Restart PM2.
-             */
-            exec(
-                "pm2 restart danuwa-md",
-                (error) => {
-                    if (error) {
-                        console.error(
-                            "PM2 restart error:",
-                            error
-                        );
-                    }
-                }
-            );
         }
     }
 
@@ -342,29 +312,11 @@ router.get("/", async (req, res) => {
  * Global error handlers.
  */
 process.on("uncaughtException", (err) => {
-    console.error(
-        "Caught exception:",
-        err
-    );
-
-    exec(
-        "pm2 restart danuwa",
-        (error) => {
-            if (error) {
-                console.error(
-                    "PM2 restart error:",
-                    error
-                );
-            }
-        }
-    );
+    console.error("Caught exception:", err);
 });
 
 process.on("unhandledRejection", (reason) => {
-    console.error(
-        "Unhandled promise rejection:",
-        reason
-    );
+    console.error("Unhandled promise rejection:", reason);
 });
 
 module.exports = router;

@@ -4,9 +4,7 @@
     "description": "A multi functional whatsapp bot Web paircode.",
     "main": "index.js",
     "scripts": {
-      "start": "pm2 start index.js --deep-monitoring --attach --name DANUWA-MD",
-      "stop": "pm2 stop DANUWA-MD",
-      "restart": "pm2 restart DANUWA-MD",
+      "start": "node index.js",
       "build": "echo \"Build step complete\""
     },
   "dependencies": {
@@ -20,5 +18,5 @@
     "path": "^0.12.7",
     "megajs": "^1.1.0",
     "pm2": "^5.2.0"
-   }
+  }
 }
