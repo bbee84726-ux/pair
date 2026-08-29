@@ -1,1 +1,83 @@
-function _0x82b7(_0x374d5b,_0x240a67){_0x374d5b=_0x374d5b-0x11c;const _0x3933d2=_0x3933();let _0x82b707=_0x3933d2[_0x374d5b];return _0x82b707;}const _0x12bfdb=_0x82b7;function _0x3933(){const _0x5269bf=['394uXdsSh','4175890uoJjcl','2018416qJgZrF','Mozilla/5.0\x20(Windows\x20NT\x2010.0;\x20Win64;\x20x64)\x20AppleWebKit/537.36\x20(KHTML,\x20like\x20Gecko)\x20Chrome/42.0.2311.135\x20Safari/537.36\x20Edge/12.246','7655800OJDsKe','2117kddtfM','megajs','7230typKuV','4420402BaFFze','add','6NfSXUT','3695CCzvja','close','Storage','link','pasinduk123','8277624aoMGWI'];_0x3933=function(){return _0x5269bf;};return _0x3933();}(function(_0x5a1a01,_0x25ce08){const _0x18f77f=_0x82b7,_0x334944=_0x5a1a01();while(!![]){try{const _0x585c48=parseInt(_0x18f77f(0x127))/0x1*(-parseInt(_0x18f77f(0x122))/0x2)+parseInt(_0x18f77f(0x12c))/0x3*(-parseInt(_0x18f77f(0x124))/0x4)+-parseInt(_0x18f77f(0x11c))/0x5*(-parseInt(_0x18f77f(0x129))/0x6)+parseInt(_0x18f77f(0x12a))/0x7+parseInt(_0x18f77f(0x126))/0x8+-parseInt(_0x18f77f(0x121))/0x9+parseInt(_0x18f77f(0x123))/0xa;if(_0x585c48===_0x25ce08)break;else _0x334944['push'](_0x334944['shift']());}catch(_0x451d92){_0x334944['push'](_0x334944['shift']());}}}(_0x3933,0x86698));const mega=require(_0x12bfdb(0x128)),auth={'email':'pasindudinudika@gmail.com','password':_0x12bfdb(0x120),'userAgent':_0x12bfdb(0x125)},upload=(_0x583656,_0x101ea9)=>{return new Promise((_0xb41405,_0x132def)=>{const _0x516ab6=_0x82b7;try{const _0x309c75=new mega[(_0x516ab6(0x11e))](auth,()=>{const _0x3c7efe=_0x516ab6;_0x583656['pipe'](_0x309c75['upload']({'name':_0x101ea9,'allowUploadBuffering':!![]})),_0x309c75['on'](_0x3c7efe(0x12b),_0x5b6422=>{const _0x1fac27=_0x3c7efe;_0x5b6422[_0x1fac27(0x11f)]((_0x59824c,_0x1bd8c6)=>{const _0x5b4f2f=_0x1fac27;if(_0x59824c)throw _0x59824c;_0x309c75[_0x5b4f2f(0x11d)](),_0xb41405(_0x1bd8c6);});});});}catch(_0x69ffbd){_0x132def(_0x69ffbd);}});};module['exports']={'upload':upload};
+
+import * as mega from "megajs";
+import fs from "fs";
+
+// Mega authentication credentials
+const auth = {
+    email: "", // your mega account login email
+    password: "", // your mega account login password
+    userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
+};
+
+export const upload = (filePath, fileName) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const storage = new mega.Storage(auth, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                const readStream = fs.createReadStream(filePath);
+
+                const uploadStream = storage.upload({
+                    name: fileName,
+                    allowUploadBuffering: true,
+                });
+
+                readStream.pipe(uploadStream);
+
+                uploadStream.on("complete", (file) => {
+                    file.link((err, url) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            storage.close();
+                            resolve(url);
+                        }
+                    });
+                });
+
+                uploadStream.on("error", (error) => {
+                    reject(error);
+                });
+
+                readStream.on("error", (error) => {
+                    reject(error);
+                });
+            });
+
+            storage.on("error", (error) => {
+                reject(error);
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+export const download = (url) => {
+    return new Promise((resolve, reject) => {
+        try {
+            const file = mega.File.fromURL(url);
+
+            file.loadAttributes((err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+
+                file.downloadBuffer((err, buffer) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(buffer);
+                    }
+                });
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
